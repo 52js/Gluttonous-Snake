@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>贪吃蛇</title>
+</head>
+<body>
+  <canvas id="can" width="400" height="400" style="background: black;"></canvas>
+  <script>
+    const ctx = document.getElementById('can').getContext('2d') //获取canvas元素并指定以2d方式绘制
+    let body = [
+      [3,6],
+      [4,6],
+      [5,6]
+    ] //初始化🐍身体，刚出来3节的坐标
+    let food = [10, 10] //初始化食物位置
+    let direction = [1, 0] //初始化方向
+    let interval //声明一个变量，用于存储计时器id
+    window.onload = function() {  
+      interval = setInterval(() => {
+        render()
+      }, 130);
+    }
+
+    function render() {  
+      // 如果碰到墙则游戏结束
+      if (check()) {
+        alert('game over')
+        clearInterval(interval)
+      }
+      let length = body.length
+      // 移动🐍身体
+      for (let i = 0; i < length - 1; i++) {
+        body[i][0] = body[i + 1][0]
+        body[i][1] = body[i + 1][1]
+      }
+      body[length - 1][0] += direction[0]
+      body[length - 1][1] += direction[1]
+
+      ctx.clearRect(0, 0, 400, 400) //清空canvas元素里的所有像素
+      for (let i = 0; i < length; i++) {
+        draw(body[i][0], body[i][1], 'red') //🐍身体设置为红色
+      }
+      draw(food[0], food[1], 'yellow') //🍎设置为黄色
+    }
+
+    function check() {
+      let header = body[body.length - 1] //🐍头的位置
+      if (header[0] < 0 || header[0] > 19 || header[1] < 0 || header[1] > 19) return true //如果🐍头超过了范围，就跳出
+      if (header[0] == food[0] && header[1] == food[1]) {
+        body.unshift([0, 0]) //如果🐍头的位置跟🍎的位置相同，则🐍身体加一节
+        food[0] = ~~(Math.random() * 20) 
+        food[1] = ~~(Math.random() * 20)
+        // 随机🍎的坐标
+      }
+
+      for (let i = 0; i < body.length - 1; i++) {
+        // 判断是否咬到自己
+        if (body[i][0] == header[0] && body[i][1] == header[1]) {
+          return true
+        }
+      }
+      return false
+    }
+
+    // canvas区域填充
+    function draw(x, y, color) {  
+      ctx.fillStyle = color
+      ctx.fillRect(x * 20 - 1, y * 20 - 1, 18, 18)
+    }
+
+    // 通过方向键控制🐍的方向
+    window.onkeydown = function (e) {  
+      switch(e.keyCode) {
+        case 37:
+          if (direction[0] != 1) {
+            direction = [0, 0]
+            direction[0] = -1
+            break
+          }
+        case 38:
+          if (direction[1] != 1) {
+            direction = [0, 0]
+            direction[1] = -1
+            break
+          }
+        case 39:
+          if (direction[0] != -1) {
+            direction = [0, 0]
+            direction[0] = 1
+            break
+          }
+        case 40:
+          if (direction[1] != -1) {
+            direction = [0, 0]
+            direction[1] = 1
+            break
+          }
+      }
+    }
+  </script>
+</body>
+</html>
